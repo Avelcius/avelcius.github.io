@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Portfolio</title>
+    <style>
+        /* Базовые стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: #0a0a1a;
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Навигация в стиле SAO */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 30, 0.9);
+            padding: 1rem;
+            z-index: 1000;
+            border-bottom: 2px solid #00f7ff;
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            background: rgba(0, 247, 255, 0.1);
+        }
+
+        .nav-item:hover {
+            background: #00f7ff;
+            color: #000;
+            box-shadow: 0 0 15px #00f7ff;
+        }
+
+        /* Страницы */
+        .page {
+            display: none;
+            padding: 5rem 2rem 2rem;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Главная страница (BNA стиль) */
+        #home {
+            background: linear-gradient(45deg, #ff3f7f, #ff6b00);
+            animation: bna-bg 10s infinite alternate;
+        }
+
+        @keyframes bna-bg {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Портфолио (Senko стиль) */
+        #portfolio {
+            background: #fff3e6;
+            color: #5a3a2b;
+        }
+
+        /* Проекты (SAO стиль) */
+        #projects {
+            background: #000a20;
+            border-top: 3px solid #00f7ff;
+        }
+
+        /* Работающие проекты (OneShot стиль) */
+        #live-projects {
+            background: #2d1a0f;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Контакты (Смешанный стиль) */
+        #contacts {
+            background: linear-gradient(135deg, #1a0a2a, #0a1a2a);
+        }
+
+        /* Секции */
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-family: 'Anime Ace', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .nav-menu {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="nav-container">
+        <ul class="nav-menu">
+            <li class="nav-item" data-page="home">Главная</li>
+            <li class="nav-item" data-page="portfolio">Портфолио</li>
+            <li class="nav-item" data-page="projects">Проекты</li>
+            <li class="nav-item" data-page="live-projects">Работающие</li>
+            <li class="nav-item" data-page="contacts">Контакты</li>
+        </ul>
+    </nav>
+
+    <!-- Страницы -->
+    <section id="home" class="page active">
+        <h2 class="section-title">Добро пожаловать!</h2>
+        <!-- Контент главной страницы -->
+    </section>
+
+    <section id="portfolio" class="page">
+        <h2 class="section-title">Мои Работы</h2>
+        <!-- Контент портфолио -->
+    </section>
+
+    <section id="projects" class="page">
+        <h2 class="section-title">Проекты</h2>
+        <!-- Контент проектов -->
+    </section>
+
+    <section id="live-projects" class="page">
+        <h2 class="section-title">Работающие Проекты</h2>
+        <!-- Контент работающих проектов -->
+    </section>
+
+    <section id="contacts" class="page">
+        <h2 class="section-title">Контакты</h2>
+        <!-- Контент контактов -->
+    </section>
+
+    <script>
+        // Переключение страниц
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const pageId = item.dataset.page;
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                document.getElementById(pageId).classList.add('active');
+            });
+        });
+
+        // Плавный скролл
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Динамическая подгрузка контента
+        const pages = {
+            home: `<div class="hero-section">
+                    <h1>Аниме Портфолио</h1>
+                    <p>Вдохновлено BNA, SAO, OneShot и Senko</p>
+                   </div>`,
+            
+            portfolio: `<div class="gallery">
+                          <!-- Добавьте свои работы здесь -->
+                       </div>`,
+            
+            contacts: `<div class="contact-form">
+                         <form>
+                           <input type="text" placeholder="Ваше имя">
+                           <input type="email" placeholder="Email">
+                           <textarea placeholder="Сообщение"></textarea>
+                           <button>Отправить</button>
+                         </form>
+                       </div>`
+        };
+
+        // Инициализация контента
+        function loadPageContent(pageId) {
+            const container = document.getElementById(pageId);
+            if(pages[pageId]) {
+                container.innerHTML += pages[pageId];
+            }
+        }
+
+        // Загрузка при необходимости
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                loadPageContent(item.dataset.page);
+            });
+        });
+
+        // Первоначальная загрузка
+        loadPageContent('home');
+    </script>
+</body>
+</html>
