@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои друзья</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .friend-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        .friend-card:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .banner-overlay {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 100%);
+        }
+        .avatar-border {
+            border: 3px solid #4a5568;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+        .social-icon {
+            transition: transform 0.2s ease;
+        }
+        .social-icon:hover {
+            transform: scale(1.2);
+        }
+        .interest-tag {
+            transition: all 0.2s ease;
+        }
+        .interest-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen text-gray-200">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-yellow-400 mb-2">Мои друзья</h1>
+            <p class="text-gray-400">Люди, которые делают мою жизнь интереснее</p>
+        </header>
+
+        <div id="friends-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Друзья будут загружены сюда -->
+        </div>
+
+        <!-- Модальное окно -->
+        <div id="friend-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 opacity-0 invisible transition-all duration-300">
+            <div class="bg-gray-800 rounded-lg max-w-2xl w-full mx-4 overflow-hidden shadow-xl transform transition-all max-h-[90vh] overflow-y-auto border border-gray-700">
+                <div class="relative">
+                    <div id="modal-banner" class="h-48 bg-gray-200 w-full relative">
+                        <div class="banner-overlay absolute inset-0"></div>
+                    </div>
+                    <div class="absolute -top-6 left-4">
+                        <img id="modal-avatar" class="avatar-border w-24 h-24 rounded-full object-cover bg-white" src="" alt="Аватар">
+                    </div>
+                </div>
+                <div class="pt-16 px-6 pb-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 id="modal-nickname" class="text-2xl font-bold text-yellow-300"></h2>
+                            <p id="modal-id" class="text-gray-400 text-sm"></p>
+                        </div>
+                        <button id="close-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-yellow-300 mb-2">О себе</h3>
+                        <p id="modal-bio" class="text-gray-300"></p>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-yellow-300 mb-2">Интересы</h3>
+                        <div id="modal-interests" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-yellow-300 mb-2">Социальные сети</h3>
+                        <div id="modal-socials" class="flex gap-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Данные друзей
+        const friends = [
+            {
+                "id": "Test",
+                "nickname": "Test",
+                "avatar": "https://avatars.fastly.steamstatic.com/e29d773c2f15fa6c0efc7d681eff3b2ce2b7b58e_full.jpg",
+                "banner": "https://github.com/Avelcius/dst/blob/main/zzz/1339742.jpeg?raw=true",
+                "bio": "Test",
+                "interests": ["Test", "Tes1", "Test2"],
+                "socials": {
+                    "telegram": "https://t.me/Avelc_channel"
+                }
+            }
+        ];
+
+        // Функция для отображения карточек друзей
+        function renderFriends() {
+            const friendsGrid = document.getElementById('friends-grid');
+            friendsGrid.innerHTML = '';
+
+            friends.forEach(friend => {
+                const friendCard = document.createElement('div');
+                friendCard.className = 'friend-card bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg cursor-pointer border border-gray-700';
+                friendCard.setAttribute('data-id', friend.id);
+                friendCard.innerHTML = `
+                    <div class="relative h-32">
+                        <img src="${friend.banner}" alt="Баннер ${friend.nickname}" class="w-full h-full object-cover">
+                        <div class="banner-overlay absolute inset-0"></div>
+                    </div>
+                    <div class="p-4 relative">
+                        <div class="absolute -top-6 left-4">
+                            <img src="${friend.avatar}" alt="Аватар ${friend.nickname}" class="avatar-border w-16 h-16 rounded-full object-cover">
+                        </div>
+                        <div class="ml-20 mt-1">
+                            <h3 class="text-xl font-bold text-yellow-300">${friend.nickname}</h3>
+                            <p class="text-gray-400 text-sm">@${friend.id}</p>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-gray-300 line-clamp-2">${friend.bio}</p>
+                        </div>
+                    </div>
+                `;
+                friendCard.addEventListener('click', () => openFriendModal(friend.id));
+                friendsGrid.appendChild(friendCard);
+            });
+        }
+
+        // Функция для открытия модального окна с информацией о друге
+        function openFriendModal(friendId) {
+            const friend = friends.find(f => f.id === friendId);
+            if (!friend) return;
+
+            // Заполняем модальное окно данными
+            document.getElementById('modal-banner').style.backgroundImage = `url('${friend.banner}')`;
+            document.getElementById('modal-avatar').src = friend.avatar;
+            document.getElementById('modal-nickname').textContent = friend.nickname;
+            document.getElementById('modal-id').textContent = `@${friend.id}`;
+            document.getElementById('modal-bio').textContent = friend.bio;
+
+            // Очищаем и заполняем интересы
+            const interestsContainer = document.getElementById('modal-interests');
+            interestsContainer.innerHTML = '';
+            friend.interests.forEach(interest => {
+                const tag = document.createElement('span');
+                tag.className = 'interest-tag bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm';
+                tag.textContent = interest;
+                interestsContainer.appendChild(tag);
+            });
+
+            // Очищаем и заполняем социальные сети
+            const socialsContainer = document.getElementById('modal-socials');
+            socialsContainer.innerHTML = '';
+            for (const [platform, value] of Object.entries(friend.socials)) {
+                const socialLink = document.createElement('a');
+                socialLink.className = 'social-icon text-gray-300 hover:text-yellow-300';
+                socialLink.target = '_blank';
+                
+                let iconClass, href;
+                switch(platform) {
+                    case 'twitter':
+                        iconClass = 'fab fa-twitter';
+                        href = value.startsWith('http') ? value : `https://twitter.com/${value}`;
+                        break;
+                    case 'discord':
+                        iconClass = 'fab fa-discord';
+                        href = `https://discord.com/users/${value}`;
+                        break;
+                    case 'telegram':
+                        iconClass = 'fab fa-telegram';
+                        href = value.startsWith('http') ? value : `https://t.me/${value}`;
+                        break;
+                    default:
+                        iconClass = 'fas fa-link';
+                        href = value;
+                }
+                
+                socialLink.href = href;
+                socialLink.innerHTML = `<i class="${iconClass} text-2xl"></i>`;
+                socialsContainer.appendChild(socialLink);
+            }
+
+            // Показываем модальное окно
+            const modal = document.getElementById('friend-modal');
+            modal.classList.remove('opacity-0', 'invisible');
+            modal.classList.add('opacity-100', 'visible');
+        }
+
+        // Закрытие модального окна
+        document.getElementById('close-modal').addEventListener('click', () => {
+            const modal = document.getElementById('friend-modal');
+            modal.classList.remove('opacity-100', 'visible');
+            modal.classList.add('opacity-0', 'invisible');
+        });
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFriends();
+            
+            // Закрытие модального окна при клике вне его
+            document.getElementById('friend-modal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('friend-modal')) {
+                    const modal = document.getElementById('friend-modal');
+                    modal.classList.remove('opacity-100', 'visible');
+                    modal.classList.add('opacity-0', 'invisible');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
